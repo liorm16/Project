@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\OneDrive\Desktop\lol.c">
+    <ClCompile Include="source\lol.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

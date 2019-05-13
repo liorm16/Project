@@ -62,6 +62,7 @@ void add_Team(team teams[])
 {
 	char team_name[ARR_SIZE];
 	getchar();
+	int name = 0;
 	if (team_num < MAX_TEAMS_NUMBER)
 	{
 		printf("The new team name: ");
@@ -70,25 +71,30 @@ void add_Team(team teams[])
 		{
 			for (int i = 0; i < team_num; i++)
 			{
-				if (strcmp(teams[i].name, team_name) == 0)
+				if (strcmp(teams[i].name, team_name) == 0) {
 					printf("The team #%d-%s is already in the league\n", i + 1, team_name);
+					name = 1;
+				}
 			}
 		}
-		int sum = 0;
-		for (int i = 0; i < strlen(team_name); i++)
-		{
-			teams[team_num].name[i] = team_name[i];
-			sum++;
+		if (name == 0) {
+			int sum = 0;
+			for (int i = 0; i < strlen(team_name); i++)
+			{
+				teams[team_num].name[i] = team_name[i];
+				sum++;
+			}
+			teams[team_num].name[sum] = '\0';
+			teams[team_num].numberOfPlayers = 0;
+			teams[team_num].wins = 0;
+			teams[team_num].points = 0;
+			teams[team_num].losses = 0;
+			teams[team_num].points = 0;
+			teams[team_num].draws = 0;
+			printf("A NEW team is in BORLAND league!\n");
+			printf("Team ~%s~ , it's team #%d in the league\n", team_name, team_num + 1);
+			team_num++;
 		}
-		teams[team_num].name[sum] = '\0';
-		teams[team_num].numberOfPlayers = 0;
-		teams[team_num].wins = 0;
-		teams[team_num].losses = 0;
-		teams[team_num].points = 0;
-		teams[team_num].draws = 0;
-		printf("A NEW team is in BORLAND league!\n");
-		printf("Team ~%s~ , it's team #%d in the league\n", team_name, team_num + 1);
-		team_num++;
 	}
 	else
 		printf("The league is full, you can't add a new team\n");
@@ -106,14 +112,16 @@ void add_Player(team teams[])
 		int select_team = 0;
 		int select_age = 0;
 		char player_name[ARR_SIZE];
+		getchar();
 		printf("Select a team (from [%d-%d]) to add a player to: ", 1, team_num);
 		scanf_s("%d", &select_team);
+		getchar();
 		if (teams[select_team - 1].numberOfPlayers <= MAX_PLAYERS)
 		{
 			teams[select_team - 1].numberOfPlayers++;
 			player pl;
 			printf("Enter player's name: ");//NEED TO CHECK LIMITATION ON NAME LENGTH AND EXISTENCE
-			scanf_s("%s", pl.name, ARR_SIZE);
+			scanf_s("%[^\t\n]", pl.name, ARR_SIZE);
 			printf("Enter player's age: ");
 			scanf_s("%d", &pl.age);
 			if (pl.age > 120 || pl.age < 0)
@@ -150,7 +158,7 @@ void add_Player(team teams[])
 }
 
 //---------------------------------------------------------------//
-void play_Game(team teams[])
+void play_Game(team teams[],int matches_played[])
 {
 	if (team_num < 2)
 		printf("You need minimum of 2 teams for a game, add teams first\n");
@@ -168,6 +176,8 @@ void play_Game(team teams[])
 			printf("Team can't play against itself\n");
 		else
 		{
+			matches_played[select_team1 - 1]++;
+			matches_played[select_team2 - 1]++;
 			int power1 = 0;
 			int power2 = 0;
 			for (int i = 0; i < teams[select_team1 - 1].numberOfPlayers; i++)
@@ -211,13 +221,52 @@ void play_Game(team teams[])
 }
 
 //---------------------------------------------------------------//
-void print_League()
+
+
+void printSpaces(int num) {
+	for (int i = 0; i < num;i++) {
+		printf(" ");
+	}
+}
+
+int numOfDigits(int num) {
+	int n = 0;
+	while (num>0) {
+		n++;
+		num = num / 10;
+	}
+	return n;
+}
+
+void print_League(team teams[], int matches_played[])
 {
+	int i = 0;
 	if (team_num < 1)
 		printf("No teams in the league, add teams first");
 	else
 	{
-
+		printf("BORLAND Futsal league ranking:\n");
+		printf("Rank    #(team number)-Team name        Matches played  Wins    draws   Losses\n");
+		printf("Points\n");
+		while(i<team_num){
+			if (i == team_num)
+				break;
+			printf("%d",i+1);
+			printSpaces(7+numOfDigits(i+1)-1);
+			printf("#%d-%s", i + 1, &teams[i].name);
+			printSpaces(29- strlen(teams[i].name));
+			printf("%d", matches_played[i]);
+			printSpaces(15 - numOfDigits(i + 1) - 1);
+			printf("%d", teams[i].wins);
+			printSpaces(7 - numOfDigits(i + 1) - 1);
+			printf("%d", teams[i].draws);
+			printSpaces(7 - numOfDigits(i + 1) - 1);
+			printf("%d\n", teams[i].losses);
+			i++;
+			if(i==team_num)
+				break;
+			printf("0\n");
+		}
 	}
 }
 
@@ -239,13 +288,44 @@ void table_sort(team teams[])
 }
 
 //---------------------------------------------------------------//
-void print_Team() {}
+void print_Team(team teams[],int matches_played[]) {
+	int select_team = 0;
+	int i = 0;
+	if (team_num > 0) {
+		printf("Select a team (from [%d-%d]): ", 1, team_num);
+		scanf_s("%d", &select_team);
+		printf("Team #%d - %s: \n", select_team, teams[select_team - 1].name);
+		printf("Matches played - %d      Wins - %d        draws - %d       Losses - %d      Points - %d\n", matches_played[select_team - 1], teams[select_team - 1].wins, teams[select_team - 1].draws, teams[select_team - 1].losses, teams[select_team - 1].points);
+		if (teams[select_team - 1].numberOfPlayers > 0) {
+			printf("Player number   Player name             Age     Attack  Defense\n");
+			while (i < teams[select_team - 1].numberOfPlayers) {
+				printf("#%d", i + 1);
+				printSpaces(14 - numOfDigits(i + 1) + 1);
+				printf("%s", &teams[select_team - 1].teamPlayers[i].name);
+				printSpaces(24 - strlen(teams[select_team - 1].teamPlayers[i].name));
+				printf("%d", teams[select_team - 1].teamPlayers[i].age);
+				printSpaces(7 - numOfDigits(teams[select_team - 1].teamPlayers[i].age) + 1);
+				printf("%d", teams[select_team - 1].teamPlayers[i].attack);
+				printSpaces(7 - numOfDigits(teams[select_team - 1].teamPlayers[i].attack) + 1);
+				printf("%d\n", teams[select_team - 1].teamPlayers[i].defense);
+				i++;
+			}
+		}
+		else {
+			printf("There are no players in the team\n");
+		}
+	}
+	else {
+		printf("There are no teams in the league, add a team first\n");
+	}
+}
 
 //---------------------------------------------------------------//
 
 int main()
 {
 	team teams[MAX_TEAMS_NUMBER] = { NULL };
+	int matches_played[10] = { 0,0,0,0,0,0,0,0,0,0 };
 	int choice = -1;
 	print_start_page();
 	while (choice != 0)
@@ -264,13 +344,13 @@ int main()
 			add_Player(teams);
 			break;
 		case 4:
-			play_Game(teams);
+			play_Game(teams,matches_played);
 			break;
 		case 5:
-			print_League();
+			print_League(teams,matches_played);
 			break;
 		case 6:
-			print_Team();
+			print_Team(teams,matches_played);
 			break;
 		default:
 			printf("\nInvalid option was chosen!!!");

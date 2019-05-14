@@ -256,11 +256,11 @@ void print_League(team teams[], int matches_played[])
 			printf("#%d-%s", i + 1, &teams[i].name);
 			printSpaces(29- strlen(teams[i].name));
 			printf("%d", matches_played[i]);
-			printSpaces(15 - numOfDigits(i + 1) - 1);
+			printSpaces(15 - numOfDigits(i + 1) + 1);
 			printf("%d", teams[i].wins);
-			printSpaces(7 - numOfDigits(i + 1) - 1);
+			printSpaces(7 - numOfDigits(i + 1) + 1);
 			printf("%d", teams[i].draws);
-			printSpaces(7 - numOfDigits(i + 1) - 1);
+			printSpaces(7 - numOfDigits(i + 1) + 1);
 			printf("%d\n", teams[i].losses);
 			i++;
 			if(i==team_num)
